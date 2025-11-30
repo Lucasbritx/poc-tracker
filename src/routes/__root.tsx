@@ -7,6 +7,7 @@ import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
 import Header from '../components/Header'
+import { useSupabaseAuth } from '../auth/supabase'
 
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
@@ -44,6 +45,24 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const auth = useSupabaseAuth()
+
+  if (auth.isLoading) {
+    return (
+      <html lang="en">
+        <head>
+          <HeadContent />
+        </head>
+        <body>
+          <div className="flex items-center justify-center min-h-screen">
+            Loading...
+          </div>
+          <Scripts />
+        </body>
+      </html>
+    )
+  }
+
   return (
     <html lang="en">
       <head>
