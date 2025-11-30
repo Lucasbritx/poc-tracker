@@ -6,7 +6,7 @@ const supabase = createClient(
   import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
 )
 
-interface SupabaseAuthState {
+export interface SupabaseAuthState {
   isAuthenticated: boolean
   user: User | null
   login: (email: string, password: string) => Promise<void>
