@@ -14,9 +14,11 @@ import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 import appCss from '../styles.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
+import type { SupabaseAuthState } from '../router'
 
 interface MyRouterContext {
   queryClient: QueryClient
+  auth: SupabaseAuthState
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({

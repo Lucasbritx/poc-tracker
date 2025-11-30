@@ -1,28 +1,27 @@
 import { useSupabaseAuth } from '@/auth/supabase'
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 
 export const Route = createFileRoute('/login')({
   validateSearch: (search) => ({
     redirect: (search.redirect as string) || '/dashboard',
   }),
-  beforeLoad: ({ search }) => {
-      const auth = useSupabaseAuth()
-    
-    if (auth.isAuthenticated) {
-      throw redirect({ to: search.redirect })
-    }
-  },
   component: LoginComponent,
 })
 
 function LoginComponent() {
   const auth = useSupabaseAuth()
-  const { redirect } = Route.useSearch()
+  const { redirect: redirectTo } = Route.useSearch()
+  const navigate = Route.useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+
+  // Redirect if already authenticated
+  if (auth.isAuthenticated && !auth.isLoading) {
+    navigate({ to: redirectTo })
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -32,7 +31,7 @@ function LoginComponent() {
     try {
       await auth.login(email, password)
       // Supabase auth will automatically update context
-      window.location.href = redirect
+      navigate({ to: redirectTo })
     } catch (err: any) {
       setError(err.message || 'Login failed')
     } finally {
