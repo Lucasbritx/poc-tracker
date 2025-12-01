@@ -40,7 +40,13 @@ export const getRouter = () => {
     routeTree,
     context: { 
       ...rqContext,
-      auth: undefined!,
+      auth: {
+        isAuthenticated: false,
+        isLoading: true,
+        user: null,
+        login: async () => {},
+        logout: async () => {},
+      } as SupabaseAuthState,
     },
     defaultPreload: 'intent',
     Wrap: (props: { children: React.ReactNode }) => {
