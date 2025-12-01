@@ -12,9 +12,12 @@ import {
   SquareFunction,
   StickyNote,
   X,
+  LogOut
 } from 'lucide-react'
+import { useSupabaseAuth } from '@/auth/supabase';
 
 export default function Header() {
+    const auth = useSupabaseAuth();
   const [isOpen, setIsOpen] = useState(false)
   const [groupedExpanded, setGroupedExpanded] = useState<
     Record<string, boolean>
@@ -32,13 +35,24 @@ export default function Header() {
         </button>
         <h1 className="ml-4 text-xl font-semibold">
           <Link to="/">
-            <img
-              src="/tanstack-word-logo-white.svg"
-              alt="TanStack Logo"
-              className="h-10"
-            />
+            Poc Tracker
           </Link>
         </h1>
+
+
+        {auth.isAuthenticated && <div className="ml-auto">
+          <button
+            onClick={() => {
+              auth.logout();
+            }}
+            className="flex items-center gap-2 p-2 hover:bg-gray-700 rounded-lg transition-colors"
+          >
+            <LogOut size={20} />
+            <span>Logout</span>
+          </button>
+        </div>}
+
+
       </header>
 
       <aside
