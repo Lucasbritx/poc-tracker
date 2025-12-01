@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 export const Route = createFileRoute('/login')({
   validateSearch: (search) => ({
-    redirect: (search.redirect as string) || '/dashboard',
+    redirect: (search.redirect as string) || '/',
   }),
   component: LoginComponent,
 })
@@ -19,8 +19,16 @@ function LoginComponent() {
   const [error, setError] = useState('')
 
   // Redirect if already authenticated
-  if (auth.isAuthenticated && !auth.isLoading) {
+  if (auth?.isAuthenticated && !auth?.isLoading) {
     navigate({ to: redirectTo })
+  }
+
+  if (!auth || auth.isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div>Loading...</div>
+      </div>
+    )
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
