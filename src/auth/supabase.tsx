@@ -1,10 +1,7 @@
-import { createClient, type User } from '@supabase/supabase-js'
+import { supabase } from '@/lib/supabase'
+import { type User } from '@supabase/supabase-js'
 import { createContext, useContext, useEffect, useState } from 'react'
 
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-)
 
 export interface SupabaseAuthState {
   isAuthenticated: boolean
