@@ -1,20 +1,19 @@
-import { supabaseServer } from '@/lib/supabase-server'
+import { supabase } from '@/lib/supabase'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated/')({
-  loader: async ({ context }) => {
-    const supabase = supabaseServer(context.request)
-
+  loader: async () => {
     const { data, error } = await supabase
       .from('pocs')
       .select('*')
       .order('created_at', { ascending: false })
 
     if (error) {
-      console.error(error)
-      throw new Error(error.message)
+      console.error('Error fetching pocs:', error)
+      return { pocs: [] }
     }
 
+    console.log('Fetched pocs:', data)
     return { pocs: data ?? [] }
   },
 
