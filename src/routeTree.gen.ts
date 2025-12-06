@@ -11,12 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedDemoTanstackQueryRouteImport } from './routes/_authenticated/demo/tanstack-query'
 import { Route as AuthenticatedDemoStorybookRouteImport } from './routes/_authenticated/demo/storybook'
 import { Route as AuthenticatedDemoStartServerFuncsRouteImport } from './routes/_authenticated/demo/start.server-funcs'
 import { Route as AuthenticatedDemoStartApiRequestRouteImport } from './routes/_authenticated/demo/start.api-request'
 import { Route as AuthenticatedDemoFormSimpleRouteImport } from './routes/_authenticated/demo/form.simple'
+import { Route as AuthenticatedDemoFormNewPocRouteImport } from './routes/_authenticated/demo/form.new-poc'
 import { Route as AuthenticatedDemoFormAddressRouteImport } from './routes/_authenticated/demo/form.address'
 import { Route as AuthenticatedDemoApiTqTodosRouteImport } from './routes/_authenticated/demo/api.tq-todos'
 import { Route as AuthenticatedDemoApiNamesRouteImport } from './routes/_authenticated/demo/api.names'
@@ -34,10 +35,10 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDemoTanstackQueryRoute =
   AuthenticatedDemoTanstackQueryRouteImport.update({
@@ -67,6 +68,12 @@ const AuthenticatedDemoFormSimpleRoute =
   AuthenticatedDemoFormSimpleRouteImport.update({
     id: '/demo/form/simple',
     path: '/demo/form/simple',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDemoFormNewPocRoute =
+  AuthenticatedDemoFormNewPocRouteImport.update({
+    id: '/demo/form/new-poc',
+    path: '/demo/form/new-poc',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDemoFormAddressRoute =
@@ -113,13 +120,14 @@ const AuthenticatedDemoStartSsrDataOnlyRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/': typeof AuthenticatedIndexRoute
   '/demo/storybook': typeof AuthenticatedDemoStorybookRoute
   '/demo/tanstack-query': typeof AuthenticatedDemoTanstackQueryRoute
   '/demo/api/names': typeof AuthenticatedDemoApiNamesRoute
   '/demo/api/tq-todos': typeof AuthenticatedDemoApiTqTodosRoute
   '/demo/form/address': typeof AuthenticatedDemoFormAddressRoute
+  '/demo/form/new-poc': typeof AuthenticatedDemoFormNewPocRoute
   '/demo/form/simple': typeof AuthenticatedDemoFormSimpleRoute
   '/demo/start/api-request': typeof AuthenticatedDemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof AuthenticatedDemoStartServerFuncsRoute
@@ -129,13 +137,14 @@ export interface FileRoutesByFullPath {
   '/demo/start/ssr': typeof AuthenticatedDemoStartSsrIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/': typeof AuthenticatedIndexRoute
   '/demo/storybook': typeof AuthenticatedDemoStorybookRoute
   '/demo/tanstack-query': typeof AuthenticatedDemoTanstackQueryRoute
   '/demo/api/names': typeof AuthenticatedDemoApiNamesRoute
   '/demo/api/tq-todos': typeof AuthenticatedDemoApiTqTodosRoute
   '/demo/form/address': typeof AuthenticatedDemoFormAddressRoute
+  '/demo/form/new-poc': typeof AuthenticatedDemoFormNewPocRoute
   '/demo/form/simple': typeof AuthenticatedDemoFormSimpleRoute
   '/demo/start/api-request': typeof AuthenticatedDemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof AuthenticatedDemoStartServerFuncsRoute
@@ -146,14 +155,15 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/login': typeof LoginRoute
+  '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/demo/storybook': typeof AuthenticatedDemoStorybookRoute
   '/_authenticated/demo/tanstack-query': typeof AuthenticatedDemoTanstackQueryRoute
   '/_authenticated/demo/api/names': typeof AuthenticatedDemoApiNamesRoute
   '/_authenticated/demo/api/tq-todos': typeof AuthenticatedDemoApiTqTodosRoute
   '/_authenticated/demo/form/address': typeof AuthenticatedDemoFormAddressRoute
+  '/_authenticated/demo/form/new-poc': typeof AuthenticatedDemoFormNewPocRoute
   '/_authenticated/demo/form/simple': typeof AuthenticatedDemoFormSimpleRoute
   '/_authenticated/demo/start/api-request': typeof AuthenticatedDemoStartApiRequestRoute
   '/_authenticated/demo/start/server-funcs': typeof AuthenticatedDemoStartServerFuncsRoute
@@ -165,13 +175,14 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
     | '/login'
+    | '/'
     | '/demo/storybook'
     | '/demo/tanstack-query'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/form/address'
+    | '/demo/form/new-poc'
     | '/demo/form/simple'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
@@ -181,13 +192,14 @@ export interface FileRouteTypes {
     | '/demo/start/ssr'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
     | '/login'
+    | '/'
     | '/demo/storybook'
     | '/demo/tanstack-query'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/form/address'
+    | '/demo/form/new-poc'
     | '/demo/form/simple'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
@@ -197,14 +209,15 @@ export interface FileRouteTypes {
     | '/demo/start/ssr'
   id:
     | '__root__'
-    | '/'
     | '/_authenticated'
     | '/login'
+    | '/_authenticated/'
     | '/_authenticated/demo/storybook'
     | '/_authenticated/demo/tanstack-query'
     | '/_authenticated/demo/api/names'
     | '/_authenticated/demo/api/tq-todos'
     | '/_authenticated/demo/form/address'
+    | '/_authenticated/demo/form/new-poc'
     | '/_authenticated/demo/form/simple'
     | '/_authenticated/demo/start/api-request'
     | '/_authenticated/demo/start/server-funcs'
@@ -215,7 +228,6 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
 }
@@ -236,12 +248,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
+    '/_authenticated/': {
+      id: '/_authenticated/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/demo/tanstack-query': {
       id: '/_authenticated/demo/tanstack-query'
@@ -276,6 +288,13 @@ declare module '@tanstack/react-router' {
       path: '/demo/form/simple'
       fullPath: '/demo/form/simple'
       preLoaderRoute: typeof AuthenticatedDemoFormSimpleRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/demo/form/new-poc': {
+      id: '/_authenticated/demo/form/new-poc'
+      path: '/demo/form/new-poc'
+      fullPath: '/demo/form/new-poc'
+      preLoaderRoute: typeof AuthenticatedDemoFormNewPocRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/demo/form/address': {
@@ -331,11 +350,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedDemoStorybookRoute: typeof AuthenticatedDemoStorybookRoute
   AuthenticatedDemoTanstackQueryRoute: typeof AuthenticatedDemoTanstackQueryRoute
   AuthenticatedDemoApiNamesRoute: typeof AuthenticatedDemoApiNamesRoute
   AuthenticatedDemoApiTqTodosRoute: typeof AuthenticatedDemoApiTqTodosRoute
   AuthenticatedDemoFormAddressRoute: typeof AuthenticatedDemoFormAddressRoute
+  AuthenticatedDemoFormNewPocRoute: typeof AuthenticatedDemoFormNewPocRoute
   AuthenticatedDemoFormSimpleRoute: typeof AuthenticatedDemoFormSimpleRoute
   AuthenticatedDemoStartApiRequestRoute: typeof AuthenticatedDemoStartApiRequestRoute
   AuthenticatedDemoStartServerFuncsRoute: typeof AuthenticatedDemoStartServerFuncsRoute
@@ -346,11 +367,13 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedDemoStorybookRoute: AuthenticatedDemoStorybookRoute,
   AuthenticatedDemoTanstackQueryRoute: AuthenticatedDemoTanstackQueryRoute,
   AuthenticatedDemoApiNamesRoute: AuthenticatedDemoApiNamesRoute,
   AuthenticatedDemoApiTqTodosRoute: AuthenticatedDemoApiTqTodosRoute,
   AuthenticatedDemoFormAddressRoute: AuthenticatedDemoFormAddressRoute,
+  AuthenticatedDemoFormNewPocRoute: AuthenticatedDemoFormNewPocRoute,
   AuthenticatedDemoFormSimpleRoute: AuthenticatedDemoFormSimpleRoute,
   AuthenticatedDemoStartApiRequestRoute: AuthenticatedDemoStartApiRequestRoute,
   AuthenticatedDemoStartServerFuncsRoute:
@@ -366,7 +389,6 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   LoginRoute: LoginRoute,
 }

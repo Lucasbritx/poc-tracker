@@ -11,7 +11,7 @@ export const Route = createFileRoute('/_authenticated/demo/form/new-poc')({
 const schema = z.object({
   nome: z.string().min(1, 'Name is required'),
   github_url: z.string().min(1, 'Github url is required'),
-  todos: z.array(z.string()).min(1, 'At least one todo is required'),
+  //todos: z.array(z.string()).min(1, 'At least one todo is required'),
 })
 
 function NewPoc() {
