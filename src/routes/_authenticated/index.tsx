@@ -1,3 +1,4 @@
+import PocCard from '@/components/PocCard'
 import { supabase } from '@/lib/supabase'
 import { createFileRoute } from '@tanstack/react-router'
 
@@ -27,11 +28,8 @@ function App() {
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
       <div className="space-y-4">
         {pocs.map((poc) => {
-          {/* <PocCard key={poc.id} poc={poc} /> */}
-          
-          return (
-          <>{poc.nome}</>
-        )})}
+          return <PocCard key={poc.id} poc={poc} />
+        })}
       </div>
     </div>
   )
