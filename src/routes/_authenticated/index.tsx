@@ -14,7 +14,7 @@ export const Route = createFileRoute('/_authenticated/')({
       return { pocs: [] }
     }
 
-    console.log('Fetched pocs:', data)
+    console.log('Fetched pocs:', data?.length || 0, 'items')
     return { pocs: data ?? [] }
   },
 
@@ -26,7 +26,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
-      <div className="space-y-4">
+      <div className="space-y-4 space-x-4 p-4 flex">
         {pocs.map((poc) => {
           return <PocCard key={poc.id} poc={poc} />
         })}
