@@ -1,3 +1,4 @@
+import { ChevronRight } from 'lucide-react'
 import * as React from 'react'
 
 interface IPoc {
@@ -17,9 +18,18 @@ function PocCard({
 }: React.ComponentProps<'div'> & {
   poc: IPoc
 }) {
-  return <div className="" {...props} >
-    {poc.nome}
-  </div>
+  return (
+    <div className="text-white border rounded h-32" {...props}>
+      <div className="bg-red-200 p-2 text-black">{poc.nome}</div>
+      <div className="flex flex-col p-2">
+        {poc.todo?.map((t) => {
+          return <div className='flex gap-0.5'>
+            <ChevronRight />
+            {t.title}</div>
+        })}
+      </div>
+    </div>
+  )
 }
 
 export default PocCard
