@@ -14,17 +14,26 @@ interface IPoc {
 function PocCard({
   className,
   poc,
+  completePocTask,
   ...props
 }: React.ComponentProps<'div'> & {
   poc: IPoc
+  completePocTask: (pocId: string, taskTitle: string) => Promise<void>
 }) {
   return (
     <div className="text-white border rounded h-32" {...props}>
       <div className="bg-red-200 p-2 text-black">{poc.nome}</div>
       <div className="flex flex-col p-2">
         {poc.todo?.map((t) => {
-          return <div className='flex gap-0.5'>
-            <ChevronRight />
+          return <div key={t.title} className='flex gap-0.5'>
+            {
+              // todo change to checkbox
+            }
+            <input
+              type="checkbox"
+              checked={t.done}
+              onChange={() => completePocTask(poc.id, t.title)}
+            />
             {t.title}</div>
         })}
       </div>
