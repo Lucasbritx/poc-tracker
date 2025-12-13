@@ -29,6 +29,11 @@ export function SupabaseAuthProvider({
       setUser(session?.user ?? null)
       setIsAuthenticated(!!session?.user)
       setIsLoading(false)
+      
+      if (session) {
+        document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`
+        document.cookie = `sb-refresh-token=${session.refresh_token}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`
+      }
     })
 
     const {
@@ -37,6 +42,16 @@ export function SupabaseAuthProvider({
       setUser(session?.user ?? null)
       setIsAuthenticated(!!session?.user)
       setIsLoading(false)
+      
+      // Sync session to cookies for SSR
+      if (session) {
+        document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`
+        document.cookie = `sb-refresh-token=${session.refresh_token}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`
+      } else {
+        // Clear cookies on logout
+        document.cookie = 'sb-access-token=; path=/; max-age=0'
+        document.cookie = 'sb-refresh-token=; path=/; max-age=0'
+      }
     })
 
     return () => subscription.unsubscribe()
