@@ -89,7 +89,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
-      <div className="p-4 flex gap-4">
+      <div className="p-4 grid grid-cols-4 gap-4">
         {pocs.map((poc) => {
           return <PocCard completePocTask={completePocTask} key={poc.id} poc={poc} />
         })}

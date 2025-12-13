@@ -21,7 +21,7 @@ function PocCard({
   completePocTask: (pocId: string, taskTitle: string) => Promise<void>
 }) {
   return (
-    <div className="text-white border rounded h-32" {...props}>
+    <div className="text-white border rounded h-full" {...props}>
       <div className="bg-red-200 p-2 text-black">{poc.nome}</div>
       <div className="flex flex-col p-2">
         {poc.todo?.map((t) => {
