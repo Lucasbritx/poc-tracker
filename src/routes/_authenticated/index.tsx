@@ -1,29 +1,32 @@
 import PocCard from '@/components/PocCard'
 import { supabase } from '@/lib/supabase'
-import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 
 export const Route = createFileRoute('/_authenticated/')({
-  loader: async () => {
-    const { data, error } = await supabase
-      .from('pocs')
-      .select('*')
-      .order('created_at', { ascending: false })
-
-    if (error) {
-      console.error('Error fetching pocs:', error)
-      return { pocs: [] }
-    }
-
-    console.log('Fetched pocs:', data?.length || 0, 'items')
-    return { pocs: data ?? [] }
-  },
-
   component: App,
 })
 
 function App() {
-  const { pocs } = Route.useLoaderData();
-  const router = useRouter();
+  const queryClient = useQueryClient()
+
+  const { data: pocs = [], isLoading } = useQuery({
+    queryKey: ['pocs'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('pocs')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        console.error('Error fetching pocs:', error)
+        throw error
+      }
+
+      console.log('Fetched pocs:', data?.length || 0, 'items')
+      return data ?? []
+    },
+  })
 
   const completePocTask = async (pocId: string, taskTitle: string) => {
     const { data: pocData, error: fetchError } = await supabase
@@ -50,8 +53,17 @@ function App() {
       console.error('Error updating poc task:', updateError)
     } else {
       console.log('Poc task updated successfully')
-      await router.invalidate()
+      // Invalidate the query to refetch
+      queryClient.invalidateQueries({ queryKey: ['pocs'] })
     }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+        <div className="text-white">Loading POCs...</div>
+      </div>
+    )
   }
 
   return (
