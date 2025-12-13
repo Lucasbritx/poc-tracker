@@ -1,34 +1,41 @@
 import PocCard from '@/components/PocCard'
-import { supabase } from '@/lib/supabase'
-import { createFileRoute } from '@tanstack/react-router'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { createServerFn } from '@tanstack/react-start'
+import { createServerSupabaseClient } from '@/lib/supabase.server'
 
-export const Route = createFileRoute('/_authenticated/')({
-  component: App,
+// Server function to fetch POCs
+const getPocs = createServerFn({ method: 'GET' }).handler(async ({ request }) => {
+  const cookieHeader = request.headers.get('cookie') || ''
+  const supabase = createServerSupabaseClient(cookieHeader)
+  
+  const { data: { session } } = await supabase.auth.getSession()
+  
+  if (!session) {
+    console.log('No session on server')
+    return []
+  }
+
+  const { data, error } = await supabase
+    .from('pocs')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    console.error('Error fetching pocs:', error)
+    return []
+  }
+
+  console.log('Fetched pocs on server:', data?.length || 0, 'items')
+  return data ?? []
 })
 
-function App() {
-  const queryClient = useQueryClient()
-
-  const { data: pocs = [], isLoading } = useQuery({
-    queryKey: ['pocs'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('pocs')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (error) {
-        console.error('Error fetching pocs:', error)
-        throw error
-      }
-
-      console.log('Fetched pocs:', data?.length || 0, 'items')
-      return data ?? []
-    },
-  })
-
-  const completePocTask = async (pocId: string, taskTitle: string) => {
+// Server function to update POC task
+const updatePocTask = createServerFn({ method: 'POST' })
+  .inputValidator((data: { pocId: string; taskTitle: string }) => data)
+  .handler(async ({ data: { pocId, taskTitle }, request }) => {
+    const cookieHeader = request.headers.get('cookie') || ''
+    const supabase = createServerSupabaseClient(cookieHeader)
+    
     const { data: pocData, error: fetchError } = await supabase
       .from('pocs')
       .select('todo')
@@ -37,7 +44,7 @@ function App() {
 
     if (fetchError) {
       console.error('Error fetching poc:', fetchError)
-      return
+      throw fetchError
     }
 
     const updatedTodo = pocData.todo.map((task: { title: string; done: boolean }) =>
@@ -51,19 +58,33 @@ function App() {
 
     if (updateError) {
       console.error('Error updating poc task:', updateError)
-    } else {
-      console.log('Poc task updated successfully')
-      // Invalidate the query to refetch
-      queryClient.invalidateQueries({ queryKey: ['pocs'] })
+      throw updateError
     }
-  }
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <div className="text-white">Loading POCs...</div>
-      </div>
-    )
+    console.log('Poc task updated successfully')
+    return { success: true }
+  })
+
+export const Route = createFileRoute('/_authenticated/')({
+  loader: async () => {
+    const pocs = await getPocs()
+    return { pocs }
+  },
+  component: App,
+})
+
+function App() {
+  const { pocs } = Route.useLoaderData()
+  const router = useRouter()
+
+  const completePocTask = async (pocId: string, taskTitle: string) => {
+    try {
+      await updatePocTask({ data: { pocId, taskTitle } })
+      // Invalidate and refetch the route data
+      await router.invalidate()
+    } catch (error) {
+      console.error('Error completing task:', error)
+    }
   }
 
   return (
