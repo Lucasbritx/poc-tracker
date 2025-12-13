@@ -11,7 +11,7 @@ export const Route = createFileRoute('/_authenticated/demo/form/new-poc')({
 const schema = z.object({
   nome: z.string().min(1, 'Name is required'),
   github_url: z.string().min(1, 'Github url is required'),
-  //todos: z.array(z.string()).min(1, 'At least one todo is required'),
+  todos: z.array(z.string()).min(1, 'At least one todo is required'),
 })
 
 function NewPoc() {
@@ -22,31 +22,37 @@ function NewPoc() {
       todos: [],
     },
     validators: {
-      onBlur: schema,
+      onChange: schema,
     },
-    onSubmit: ({ value }) => {
-      console.log(value)
-      createPoc();
+    onSubmit: async ({ value }) => {
+      console.log('value - ', value)
+      await createPoc(value)
       alert('Form submitted successfully!')
     },
   })
 
-  async function createPoc() {
+  async function createPoc(formData: {
+    nome: string
+    github_url: string
+    todos: string[]
+  }) {
     const { data, error } = await supabase
       .from('pocs')
       .insert({
-        nome: 'Minha POC 1',
-        todo: [
-          { title: 'Criar layout', done: false },
-          { title: 'Configurar backend', done: false },
-        ],
+        nome: formData.nome,
+        todo: formData.todos.map((title) => ({ title, done: false })),
         status: 'pending',
-        github_url: 'https://github.com/user/repo',
+        github_url: formData.github_url,
         user_id: (await supabase.auth.getUser()).data.user?.id,
       })
       .select()
 
-    console.log({ data, error })
+    if (error) {
+      console.error('Error creating POC:', error)
+      alert('Error creating POC: ' + error.message)
+    } else {
+      console.log('POC created successfully:', data)
+    }
   }
 
   return (
@@ -57,7 +63,7 @@ function NewPoc() {
           'radial-gradient(50% 50% at 5% 40%, #add8e6 0%, #0000ff 70%, #00008b 100%)',
       }}
     >
-      <div className="w-full max-w-2xl p-8 rounded-xl backdrop-blur-md bg-black/50 shadow-xl border-8 border-black/10">
+      <div className="w-full max-w-2xl p-8 rounded-xl backdrop-blur-md bg-blue/50 shadow-xl border-8 border-black/10">
         <form
           onSubmit={(e) => {
             e.preventDefault()
@@ -74,15 +80,63 @@ function NewPoc() {
             {(field) => <field.TextField label="Github Url" />}
           </form.AppField>
 
-          <form.AppField name="todos">
-            {(field) => <field.TextField label="Todos" />}
+          <form.AppField name="todos" mode="array">
+            {(field) => {
+              return (
+                <div>
+                  <label className="block mb-2">Todos:</label>
+                  {field.state.value.map((_, i) => {
+                    return (
+                      <form.AppField key={i} name={`todos[${i}]`}>
+                        {(subField) => {
+                          return (
+                            <div className="mb-2">
+                              <input
+                                className="text-black p-2 rounded"
+                                value={subField.state.value}
+                                onChange={(e) =>
+                                  subField.handleChange(e.target.value)
+                                }
+                                placeholder={`Todo ${i + 1}`}
+                              />
+                            </div>
+                          )
+                        }}
+                      </form.AppField>
+                    )
+                  })}
+                  <button
+                    onClick={() => field.pushValue('')}
+                    type="button"
+                    className="bg-blue-500 px-4 py-2 rounded mt-2"
+                  >
+                    Add todo
+                  </button>
+                </div>
+              )
+            }}
           </form.AppField>
 
-          <div className="flex justify-end">
-            <form.AppForm>
-              <form.SubscribeButton label="Submit" />
-            </form.AppForm>
-          </div>
+          <form.Subscribe
+            selector={(state) => ({
+              canSubmit: state.canSubmit,
+              isSubmitting: state.isSubmitting,
+              errors: state.errors,
+              values: state.values,
+            })}
+          >
+            {(state) => (
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  disabled={!state.canSubmit || state.isSubmitting}
+                  className="bg-green-500 px-6 py-2 rounded hover:bg-green-600"
+                >
+                  {state.isSubmitting ? 'Submitting...' : 'Submit'}
+                </button>
+              </div>
+            )}
+          </form.Subscribe>
         </form>
       </div>
     </div>
